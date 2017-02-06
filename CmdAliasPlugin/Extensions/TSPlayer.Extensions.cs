@@ -40,16 +40,16 @@ namespace Wolfje.Plugins.SEconomy.CmdAliasModule.Extensions {
 					call(new TShockAPI.CommandArgs(cmdText, player, args));
 					return true;
 				}
-				player.SendErrorMessage("Invalid command entered. Type /help for a list of valid commands.");
+				player.SendErrorMessage("命令错误。输入/help 查看可用命令列表。");
 				return true;
 			}
 
 			foreach (TShockAPI.Command cmd in cmds) {
 				if (!cmd.AllowServer && !player.RealPlayer) {
-					player.SendErrorMessage("You must use this command in-game.");
+					player.SendErrorMessage("你只能在游戏中使用这个命令。");
 				} else {
 					if (cmd.DoLog)
-						TShockAPI.TShock.Utils.SendLogs(string.Format("{0} executed: /{1}.", player.Name, cmdText), Color.Red);
+						TShockAPI.TShock.Utils.SendLogs(string.Format("{0} 执行了: /{1}.", player.Name, cmdText), Microsoft.Xna.Framework.Color.Red);
 					cmd.RunWithoutPermissions(cmdText, player, args);
 				}
 			}

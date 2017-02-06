@@ -17,7 +17,7 @@ namespace Wolfje.Plugins.SEconomy.CmdAliasModule {
 	/// <summary>
 	/// Provides command aliases that can cost money to execute in SEconomy.
 	/// </summary>
-	[ApiVersion(1, 22)]
+	[ApiVersion(2, 0)]
 	public class CmdAliasPlugin : TerrariaPlugin {
 		protected static CmdAlias aliasCmdInstance;
 
@@ -38,7 +38,7 @@ namespace Wolfje.Plugins.SEconomy.CmdAliasModule {
 
 		public override string Author {
 			get {
-				return "Wolfje";
+				return "Wolfje 汉化:恋";
 			}
 		}
 
@@ -50,7 +50,7 @@ namespace Wolfje.Plugins.SEconomy.CmdAliasModule {
 
 		public override string Name {
 			get {
-				return "CmdAlias";
+				return "自定义命令(CmdAlias) 汉化版";
 			}
 		}
 

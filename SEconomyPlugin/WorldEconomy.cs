@@ -8,10 +8,10 @@ using Terraria;
 using Wolfje.Plugins.SEconomy.Configuration.WorldConfiguration;
 using Wolfje.Plugins.SEconomy.Journal;
 using TShockAPI;
+using Microsoft.Xna.Framework;
 
 namespace Wolfje.Plugins.SEconomy
 {
-
     /// <summary>
     /// World economy. Provides monetary gain and loss as a 
     /// result of interaction in the world, including mobs 
@@ -63,7 +63,6 @@ namespace Wolfje.Plugins.SEconomy
         /// </summary>
         public Configuration.WorldConfiguration.WorldConfig WorldConfiguration { get; private set; }
 
-
         public WorldEconomy(SEconomy parent)
         {
             this.WorldConfiguration = Configuration.WorldConfiguration.WorldConfig.LoadConfigurationFromFile(
@@ -109,23 +108,51 @@ namespace Wolfje.Plugins.SEconomy
             }
         }
 
+        public static bool HasBuff(Player p, int buff)
+        {
+            for (int i = 0; i < 22; i++)
+            {
+                if (p.buffType[i] == buff && p.buffTime[i] > 0)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
         #region "NPC Reward handling"
 
         /// <summary>
         /// Adds damage done by a player to an NPC slot.  When the NPC dies the rewards for it will fill out.
         /// </summary>
-        protected void AddNPCDamage(Terraria.NPC NPC, Terraria.Player Player, int Damage, bool crit = false)
+        protected void AddNPCDamage(Terraria.NPC NPC, TSPlayer Player, int Damage, bool crit = false)
         {
             List<PlayerDamage> damageList = null;
             PlayerDamage playerDamage = null;
             double dmg;
 
-
-            if (Player == null || NPC.active == false || NPC.life <= 0)
+            if (Player.TPlayer == null || NPC.active == false || NPC.life <= 0)
             {
                 return;
             }
-
+            if (!Player.HasPermission(WorldConfiguration.PermissionForIgnoreAbove))
+            {
+                if (WorldConfiguration.IgnoreNPCStrikeWhenFrozen && (Player.TPlayer.frozen || HasBuff(Player.TPlayer, 47)))
+                {
+                    return;
+                }
+                if (WorldConfiguration.IgnoreNPCStrikeWhenWebbed && (Player.TPlayer.webbed || HasBuff(Player.TPlayer, 149)))
+                {
+                    return;
+                }
+                if (WorldConfiguration.IgnoreNPCStrikeWhenStoned && (Player.TPlayer.stoned || HasBuff(Player.TPlayer, 156)))
+                {
+                    return;
+                }
+                if (Vector2.Distance(NPC.position, Player.TPlayer.position) > WorldConfiguration.IgnoreNPCStrikeOutOfRange)
+                {
+                    return;
+                }
+            }
             lock (__dictionaryMutex)
             {
                 if (DamageDictionary.ContainsKey(NPC))
@@ -140,9 +167,9 @@ namespace Wolfje.Plugins.SEconomy
 
             lock (__NPCDamageMutex)
             {
-                if ((playerDamage = damageList.FirstOrDefault(i => i.Player == Player)) == null)
+                if ((playerDamage = damageList.FirstOrDefault(i => i.Player == Player.TPlayer)) == null)
                 {
-                    playerDamage = new PlayerDamage() { Player = Player };
+                    playerDamage = new PlayerDamage() { Player = Player.TPlayer };
                     damageList.Add(playerDamage);
                 }
 
@@ -202,12 +229,12 @@ namespace Wolfje.Plugins.SEconomy
 
                     //load override by NPC type, this allows you to put a modifier on the base for a specific mob type.
                     Configuration.WorldConfiguration.NPCRewardOverride overrideReward = WorldConfiguration.Overrides.FirstOrDefault(i => i.NPCID == NPC.type);
-                    if (overrideReward != null)
+
+                    if (overrideReward != null && (!player.GetData<bool>("seconomy.tc")))
                     {
                         rewardMoney = CustomMultiplier * Convert.ToInt64(Math.Round(Convert.ToDouble(overrideReward.OverridenMoneyPerDamagePoint) * damage.Damage));
                     }
-
-                    if (rewardMoney <= 0 || player.Group.HasPermission("seconomy.world.mobgains") == false)
+                    if (rewardMoney <= 0 || player.HasPermission("seconomy.world.mobgains") == false)
                     {
                         continue;
                     }
@@ -383,7 +410,7 @@ namespace Wolfje.Plugins.SEconomy
                     return;
                 }
 
-                AddNPCDamage(npc, player.TPlayer, dmgPacket.Damage, Convert.ToBoolean(dmgPacket.CrititcalHit));
+                AddNPCDamage(npc, player, dmgPacket.Damage, Convert.ToBoolean(dmgPacket.CrititcalHit));
             }
         }
 
@@ -412,7 +439,6 @@ namespace Wolfje.Plugins.SEconomy
             }
             catch
             {
-
             }
         }
     }
@@ -427,4 +453,3 @@ namespace Wolfje.Plugins.SEconomy
     }
 
 }
-

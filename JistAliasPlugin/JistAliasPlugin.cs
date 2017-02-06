@@ -9,13 +9,13 @@ using TerrariaApi.Server;
 using Wolfje.Plugins.SEconomy.CmdAliasModule;
 
 namespace Wolfje.Plugins.SEconomy.JistAliasModule {
-	[ApiVersion(1, 22)]
+	[ApiVersion(2, 0)]
 	public class JistAliasPlugin : TerrariaPlugin {
-		public override string Author { get { return "Wolfje"; } }
+		public override string Author { get { return "Wolfje 汉化:恋"; } }
 
 		public override string Description { get { return "Provides AliasCmd scripting support for Jist"; } }
 
-		public override string Name { get { return "JistAlias"; } }
+		public override string Name { get { return "自定义命令Javascript(JistAlias) 汉化版"; } }
 
 		public override Version Version { get { return Assembly.GetExecutingAssembly().GetName().Version; } }
 

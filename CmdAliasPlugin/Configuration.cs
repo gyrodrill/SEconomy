@@ -24,14 +24,14 @@ namespace Wolfje.Plugins.SEconomy.CmdAliasModule {
 				config = JsonConvert.DeserializeObject<Configuration>(fileText);
 			} catch (Exception ex) {
 				if (ex is System.IO.FileNotFoundException || ex is System.IO.DirectoryNotFoundException) {
-					TShock.Log.ConsoleError("cmdalias configuration: Cannot find file or directory. Creating new one.");
+					TShock.Log.ConsoleError("CmdAlias配置:找不到文件或目录。正在创建。");
 
 					config = Configuration.NewSampleConfiguration();
 					config.SaveConfiguration(Path);
 				} else if (ex is System.Security.SecurityException) {
-					TShock.Log.ConsoleError("cmdalias configuration: Access denied reading file " + Path);
+					TShock.Log.ConsoleError("CmdAlias配置:没有权限读取文件" + Path);
 				} else {
-					TShock.Log.ConsoleError("cmdalias configuration: error " + ex.ToString());
+					TShock.Log.ConsoleError("CmdAlias配置:发生错误" + ex.ToString());
 				}
 			}
 
@@ -79,7 +79,7 @@ namespace Wolfje.Plugins.SEconomy.CmdAliasModule {
 
 				foreach (AliasCommand alias in extraConfig.CommandAliases) {
 					if (config.CommandAliases.FirstOrDefault(i => i.CommandAlias == alias.CommandAlias) != null) {
-						TShock.Log.ConsoleError("aliascmd warning: Duplicate alias {0} in file {1} ignored",
+						TShock.Log.ConsoleError("AliasCmd警告: 文件{1}中出现重复命令{0}，已忽略。",
 							alias.CommandAlias, System.IO.Path.GetFileName(aliasFile));
 						continue;
 					}
@@ -95,9 +95,9 @@ namespace Wolfje.Plugins.SEconomy.CmdAliasModule {
 		{
 			Configuration newConfig = new Configuration();
 
-			newConfig.CommandAliases.Add(AliasCommand.Create("testparms", "", "0c", "", 0, "/bc Input param 1 2 3: $1 $2 $3", "/bc Input param 1-3: $1-3", "/bc Input param 2 to end of line: $2-"));
-			newConfig.CommandAliases.Add(AliasCommand.Create("testrandom", "", "0c", "", 0, "/bc Random Number: $random(1,100)"));
-			newConfig.CommandAliases.Add(AliasCommand.Create("impersonate", "", "0c", "", 0, "$runas($1,/me can fit $random(1,100) cocks in their mouth at once.)"));
+			newConfig.CommandAliases.Add(AliasCommand.Create("testparms", "", "0c", "", 0, "/bc 参数1 2 3: $1 $2 $3", "/bc 参数1-3: $1-3", "/bc 参数2到该行结尾: $2-"));
+			newConfig.CommandAliases.Add(AliasCommand.Create("testrandom", "", "0c", "", 0, "/bc 随机数: $random(1,100)"));
+			newConfig.CommandAliases.Add(AliasCommand.Create("impersonate", "", "0c", "", 0, "$runas($1,/me 原文已屏蔽，这里只留个随机数 $random(1,100) 。)"));
 
 			return newConfig;
 		}
@@ -113,12 +113,12 @@ namespace Wolfje.Plugins.SEconomy.CmdAliasModule {
 			} catch (Exception ex) {
 
 				if (ex is System.IO.DirectoryNotFoundException) {
-					TShock.Log.ConsoleError("cmdalias config: save directory not found: " + Path);
+					TShock.Log.ConsoleError("CmdAlias配置:没有找到文件夹" + Path);
 
 				} else if (ex is UnauthorizedAccessException || ex is System.Security.SecurityException) {
-					TShock.Log.ConsoleError("cmdalias config: Access is denied to Vault config: " + Path);
+					TShock.Log.ConsoleError("CmdAlias配置:没有权限" + Path);
 				} else {
-					TShock.Log.ConsoleError("cmdalias config: Error reading file: " + Path);
+					TShock.Log.ConsoleError("CmdAlias配置:发生错误" + Path);
 					throw;
 				}
 			}

@@ -39,9 +39,9 @@ namespace Wolfje.Plugins.SEconomy {
 	/// 
 	/// Copyright (C) Tyler Watson, 2013-2014.
 	/// 
-	/// API Version 1.1
+	/// API Version 2.0 Updated by Koishi
 	/// </summary>
-	[ApiVersion(1, 22)]
+	[ApiVersion(2, 0)]
 	public class SEconomyPlugin : TerrariaPlugin {
 		public static Lang.Localization Locale { get; private set; }
 
@@ -56,7 +56,7 @@ You do NOT have to restart the server to issue this command.  Just continue as n
 
 		public override string Author {
 			get {
-				return "Wolfje";
+				return "Wolfje 汉化:恋";
 			}
 		}
 
@@ -68,12 +68,12 @@ You do NOT have to restart the server to issue this command.  Just continue as n
 
 		public override string Name {
 			get {
-				string s = "SEconomy (Milestone 1) Update " + this.Version.Build;
+				string s = "SEconomy" + this.Version.Build;
 #if __PREVIEW
 				s += " Preview";
 #endif
 
-				return s;
+				return s + " 汉化版";
 			}
 		}
 
@@ -98,7 +98,7 @@ You do NOT have to restart the server to issue this command.  Just continue as n
 		public override void Initialize()
 		{
 			Lang.Localization.PrepareLanguages();
-			Locale = new Lang.Localization("en-AU");
+			Locale = new Lang.Localization("zh-CN");
 
 			PrintIntro();
 
@@ -106,7 +106,7 @@ You do NOT have to restart the server to issue this command.  Just continue as n
 			try {
 				Instance = new SEconomy(this);
 				if (Instance.LoadSEconomy() < 0) {
-					throw new Exception("LoadSEconomy() failed.");
+					throw new Exception("LoadSEconomy() 失败。");
 				}
 			} catch {
 				Instance = null;
@@ -126,10 +126,12 @@ You do NOT have to restart the server to issue this command.  Just continue as n
 
 			Console.WriteLine();
 			Console.ForegroundColor = ConsoleColor.Cyan;
-			Console.Write(" SEconomy Update ");
+			Console.Write(" SEconomy ");
 			Console.ForegroundColor = ConsoleColor.Yellow;
 			Console.Write(this.Version.Build);
-			
+			Console.ForegroundColor = ConsoleColor.Cyan;
+			Console.Write("汉化版");
+
 #if __PREVIEW
 			Console.ForegroundColor = ConsoleColor.Gray;
 			Console.Write(" Preview");
@@ -151,7 +153,7 @@ You do NOT have to restart the server to issue this command.  Just continue as n
             originalBackColour = Console.BackgroundColor;
             Console.ForegroundColor = ConsoleColor.Black;
             Console.BackgroundColor = ConsoleColor.Yellow;
-            Console.WriteLine(" SEconomy is free software.  If you paid for it you were scammed.");
+            Console.WriteLine(" SEconomy是个免费软件。如果你购买了它，那么你受骗了。");
             Console.BackgroundColor = originalBackColour;
             Console.WriteLine("\r\n");
 
@@ -163,7 +165,7 @@ You do NOT have to restart the server to issue this command.  Just continue as n
 #endif
 
             Console.ForegroundColor = ConsoleColor.Cyan;
-			Console.WriteLine(" Please wait...");
+			Console.WriteLine(" 请稍候...");
 			Console.WriteLine();
 			Console.ResetColor();
 		}
@@ -179,6 +181,7 @@ You do NOT have to restart the server to issue this command.  Just continue as n
 				sb.AppendFormat(" {0}", this.Version.Revision);
 			}
 #endif
+			sb.Append(" 汉化版");
 			return sb.ToString();
 		}
 
@@ -200,11 +203,11 @@ You do NOT have to restart the server to issue this command.  Just continue as n
 		protected async void TShock_CommandExecuted(TShockAPI.CommandArgs args)
 		{
 			if (args.Parameters.Count == 0) {
-				args.Player.SendInfoMessage(string.Format(Locale.StringOrDefault(3, "{0} by Wolfje"), GetVersionString()));
-				args.Player.SendInfoMessage(" * http://plugins.tw.id.au");
-				args.Player.SendInfoMessage(Locale.StringOrDefault(5, " * /sec[onomy] reload|rl - Reloads SEconomy"));
-				args.Player.SendInfoMessage(Locale.StringOrDefault(6, " * /sec[onomy] stop - Stops and unloads SEconomy"));
-				args.Player.SendInfoMessage(Locale.StringOrDefault(7, " * /sec[onomy] start - Starts SEconomy"));
+				args.Player.SendInfoMessage(string.Format(Locale.StringOrDefault(3, "{0} 作者:Wolfje 汉化:恋"), GetVersionString()));
+				args.Player.SendInfoMessage(" 下载:http://plugins.tw.id.au  汉化:群190534564");
+				args.Player.SendInfoMessage(Locale.StringOrDefault(5, " * /sec[onomy] reload|rl - 重新加载SEconomy"));
+				args.Player.SendInfoMessage(Locale.StringOrDefault(6, " * /sec[onomy] stop - 停止SEconomy"));
+				args.Player.SendInfoMessage(Locale.StringOrDefault(7, " * /sec[onomy] start - 启动SEconomy"));
 				return;
 			}
 
@@ -235,14 +238,14 @@ You do NOT have to restart the server to issue this command.  Just continue as n
 					});
 				} catch {
 					RaiseUnloadedEvent();
-					args.Player.SendErrorMessage(Locale.StringOrDefault(12, "SEconomy failed to initialize, and will be unavailable for this session."));
+					args.Player.SendErrorMessage(Locale.StringOrDefault(12, "SEconomy加载失败。"));
 					return;
 				}
-				args.Player.SendSuccessMessage(Locale.StringOrDefault(8, "SEconomy is reloaded."));
+				args.Player.SendSuccessMessage(Locale.StringOrDefault(8, "SEconomy已重新加载。"));
 			} else if (args.Parameters[0].Equals("stop", StringComparison.CurrentCultureIgnoreCase)
 			           && args.Player.Group.HasPermission("seconomy.command.stop") == true) {
 				if (Instance == null) {
-					args.Player.SendErrorMessage(Locale.StringOrDefault(9, "seconomy stop: SEconomy is already stopped. Use /sec start to start"));
+					args.Player.SendErrorMessage(Locale.StringOrDefault(9, "seconomy stop: SEconomy已经停止。输入/sec start重新启动SEconomy。"));
 					return;
 				}
 
@@ -251,12 +254,12 @@ You do NOT have to restart the server to issue this command.  Just continue as n
 					Instance = null;
 				});
 
-				args.Player.SendSuccessMessage(Locale.StringOrDefault(10, "SEconomy is stopped."));
+				args.Player.SendSuccessMessage(Locale.StringOrDefault(10, "SEconomy已停止。"));
 				RaiseUnloadedEvent();
 			} else if (args.Parameters[0].Equals("start", StringComparison.CurrentCultureIgnoreCase)
 			           && args.Player.Group.HasPermission("seconomy.command.start") == true) {
 				if (Instance != null) {
-					args.Player.SendErrorMessage(Locale.StringOrDefault(11, "seconomy stop: SEconomy is already started. Use /sec stop to stop."));
+					args.Player.SendErrorMessage(Locale.StringOrDefault(11, "seconomy stop: SEconomy已经启动。输入/sec stop停止SEconomy。"));
 					return;
 				}
 				try {

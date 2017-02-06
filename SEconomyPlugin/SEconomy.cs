@@ -63,8 +63,8 @@ namespace Wolfje.Plugins.SEconomy {
 		public int LoadSEconomy()
 		{
 			if (IsNet45OrNewer() == false) {
-				TShock.Log.ConsoleError("SEconomy requires Microsoft .NET framework 4.5 or later.");
-				TShock.Log.ConsoleError("SEconomy will not run.");
+				TShock.Log.ConsoleError("SEconomy需要安装Microsoft .NET framework 4.5或更新版本。");
+				TShock.Log.ConsoleError("本机上尚未安装，因此SEconomy将不会运行。");
 				return -1;
 			}
 
@@ -115,12 +115,12 @@ namespace Wolfje.Plugins.SEconomy {
 		internal async Task<Journal.IBankAccount> CreatePlayerAccountAsync(TSPlayer player)
 		{
 			Money startingMoney;
-			Journal.IBankAccount newAccount = SEconomyPlugin.Instance.RunningJournal.AddBankAccount(player.UserAccountName, 
+			Journal.IBankAccount newAccount = SEconomyPlugin.Instance.RunningJournal.AddBankAccount(player.Name, 
 				                                  Terraria.Main.worldID, 
 				                                  Journal.BankAccountFlags.Enabled, 
 				                                  "");
 
-			TShock.Log.ConsoleInfo(string.Format("seconomy: bank account for {0} created.", player.UserAccountName));
+			TShock.Log.ConsoleInfo(string.Format("SEconomy:已创建{0}的账户。", player.Name));
 
 			if (Money.TryParse(SEconomyPlugin.Instance.Configuration.StartingMoney, out startingMoney)
 			    && startingMoney > 0) {
@@ -147,13 +147,13 @@ namespace Wolfje.Plugins.SEconomy {
 			}
 
 			await WorldAccount.SyncBalanceAsync();
-			TShock.Log.ConsoleInfo(string.Format(SEconomyPlugin.Locale.StringOrDefault(1, "SEconomy: world account: paid {0} to players."), WorldAccount.Balance.ToLongString()));
+			TShock.Log.ConsoleInfo(string.Format(SEconomyPlugin.Locale.StringOrDefault(1, "SEconomy: 世界: 共支付{0}给玩家。"), WorldAccount.Balance.ToLongString()));
 
 			await Task.Delay(5000);
 			foreach (var player in TShockAPI.TShock.Players) {
 				if (player == null
 				    || string.IsNullOrWhiteSpace(player.Name) == true
-				    || string.IsNullOrWhiteSpace(player.UserAccountName) == true
+				    || string.IsNullOrWhiteSpace(player.Name) == true
 				    || (account = GetBankAccount(player)) == null) {
 					continue;
 				}
@@ -220,7 +220,7 @@ namespace Wolfje.Plugins.SEconomy {
 			}
 
 			try {
-				return RunningJournal.GetBankAccountByName(tsPlayer.UserAccountName);
+				return RunningJournal.GetBankAccountByName(tsPlayer.Name);
 			} catch (Exception ex) {
 				TShock.Log.ConsoleError("seconomy error: Error getting bank account for {0}: {1}", 
 					tsPlayer.Name, ex.Message);
@@ -235,7 +235,7 @@ namespace Wolfje.Plugins.SEconomy {
 
 		public IBankAccount GetBankAccount(string userAccountName)
 		{
-			return GetBankAccount(TShockAPI.TShock.Players.FirstOrDefault(i => i != null && i.UserAccountName == userAccountName));
+			return GetBankAccount(TShockAPI.TShock.Players.FirstOrDefault(i => i != null && i.Name == userAccountName));
 		}
 
 		public IBankAccount GetPlayerBankAccount(string playerName)

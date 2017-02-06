@@ -25,7 +25,13 @@ using Newtonsoft.Json;
 using TShockAPI;
 
 namespace Wolfje.Plugins.SEconomy.Configuration.WorldConfiguration {
-	public class WorldConfig {
+	public class WorldConfig
+	{
+		public bool IgnoreNPCStrikeWhenFrozen = true;
+		public bool IgnoreNPCStrikeWhenWebbed = true;
+		public bool IgnoreNPCStrikeWhenStoned = true;
+		public float IgnoreNPCStrikeOutOfRange = 5000f;
+		public string PermissionForIgnoreAbove = "seconomy.world.bypassignore";
 		public bool MoneyFromNPCEnabled = true;
 		public bool MoneyFromBossEnabled = true;
 		public bool MoneyFromPVPEnabled = true;

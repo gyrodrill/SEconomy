@@ -49,14 +49,14 @@ namespace Wolfje.Plugins.SEconomy.CmdAliasModule {
 
 				try {
 					await ReloadConfigAfterDelayAsync(1);
-					args.Player.SendInfoMessage("aliascmd: reloading complete.");
+					args.Player.SendInfoMessage("CmdAlias: 重新加载成功。");
 				} catch (Exception ex) {
-					args.Player.SendErrorMessage("aliascmd: reload failed.  You need to check the server console to find out what went wrong.");
-					TShock.Log.ConsoleError("aliascmd reload: Cannot load configuration: {0}", ex.Message);
+					args.Player.SendErrorMessage("CmdAlias: 重新加载失败。查看后台获取更多信息。");
+					TShock.Log.ConsoleError("CmdAlias: 无法重新加载配置: {0}", ex.Message);
 				}
 
 			} else {
-				args.Player.SendErrorMessage("aliascmd: usage: /aliascmd reload: reloads the AliasCmd configuration file.");
+				args.Player.SendErrorMessage("CmdAlias用法: /aliascmd reload: 重新加载CmdAlias配置文件。");
 			}
 		}
 
@@ -66,7 +66,7 @@ namespace Wolfje.Plugins.SEconomy.CmdAliasModule {
 		protected async Task ReloadConfigAfterDelayAsync(int DelaySeconds)
 		{
 			await Task.Delay(DelaySeconds * 1000);
-			TShock.Log.ConsoleInfo("AliasCmd: reloading config.");
+			TShock.Log.ConsoleInfo("AliasCmd: 重新加载配置文件。");
 
 			try {
 				Configuration reloadedConfig = Configuration.LoadConfigurationFromFile("tshock" + System.IO.Path.DirectorySeparatorChar + "SEconomy" + System.IO.Path.DirectorySeparatorChar + "AliasCmd.config.json");
@@ -75,11 +75,11 @@ namespace Wolfje.Plugins.SEconomy.CmdAliasModule {
 				ParseCommands();
 
 			} catch (Exception ex) {
-				TShock.Log.ConsoleError("aliascmd: Your new config could not be loaded, fix any problems and save the file.  Your old configuration is in effect until this is fixed. \r\n\r\n" + ex.ToString());
+				TShock.Log.ConsoleError("CmdAlias: 新的配置文件无法加载，请更正其中的错误后保存。在此之前，服务器将使用旧的配置文件。\r\n\r\n" + ex.ToString());
 				throw;
 			}
 
-			TShock.Log.ConsoleInfo("AliasCmd: config reload done.");
+			TShock.Log.ConsoleInfo("CmdAlias: 重新加载配置文件。");
 		}
 
 		internal void PopulateCooldownList(KeyValuePair<string, AliasCommand> cooldownReference, TimeSpan? customValue = null)
@@ -113,7 +113,7 @@ namespace Wolfje.Plugins.SEconomy.CmdAliasModule {
 				}
 
 				//cooldown key is a pair of the user's character name, and the command they have called.
-				KeyValuePair<string, AliasCommand> cooldownReference = new KeyValuePair<string, AliasCommand>(e.CommandArgs.Player.UserAccountName, alias);
+				KeyValuePair<string, AliasCommand> cooldownReference = new KeyValuePair<string, AliasCommand>(e.CommandArgs.Player.Name, alias);
 				if (CooldownList.ContainsKey(cooldownReference)) {
 					//UTC time so we don't get any daylight saving shit cuntery
 					canRunNext = CooldownList[cooldownReference];
@@ -122,7 +122,7 @@ namespace Wolfje.Plugins.SEconomy.CmdAliasModule {
 				//has the time elapsed greater than the cooldown period?
 				if (DateTime.UtcNow <= canRunNext
 				    && e.CommandArgs.Player.Group.HasPermission("aliascmd.bypasscooldown") == false) {
-					e.CommandArgs.Player.SendErrorMessage("{0}: You need to wait {1:0} more seconds to be able to use that.",
+					e.CommandArgs.Player.SendErrorMessage("{0}: 你需要等{1:0}秒才能再次使用这个命令。",
 						alias.CommandAlias,
 						canRunNext.Subtract(DateTime.UtcNow).TotalSeconds);
 					return;
@@ -140,18 +140,18 @@ namespace Wolfje.Plugins.SEconomy.CmdAliasModule {
 
                 
 				if ((playerAccount = SEconomyPlugin.Instance.GetBankAccount(e.CommandArgs.Player)) == null) {
-					e.CommandArgs.Player.SendErrorMessage("This command costs money and you don't have a bank account.  Please log in first.");
+					e.CommandArgs.Player.SendErrorMessage("这个命令需要登录。");
 					return;
 				}
 
 				if (playerAccount.IsAccountEnabled == false) {
-					e.CommandArgs.Player.SendErrorMessage("This command costs money and your account is disabled.");
+					e.CommandArgs.Player.SendErrorMessage("你的账户已被禁用。");
 					return;
 				}
 
 				if (playerAccount.Balance < commandCost) {
 					Money difference = commandCost - playerAccount.Balance;
-					e.CommandArgs.Player.SendErrorMessage("This command costs {0}. You need {1} more to be able to use this.", commandCost.ToLongString(), difference.ToLongString());
+					e.CommandArgs.Player.SendErrorMessage("使用这个命令需要{0}。你还需要{1}才可以使用这个命令。", commandCost.ToLongString(), difference.ToLongString());
 				}
 
 				try {
@@ -165,10 +165,10 @@ namespace Wolfje.Plugins.SEconomy.CmdAliasModule {
 						return;
 					}
 
-					e.CommandArgs.Player.SendErrorMessage("Your payment failed.");
+					e.CommandArgs.Player.SendErrorMessage("支付失败。");
 				} catch (Exception ex) {
-					e.CommandArgs.Player.SendErrorMessage("An error occured in the alias.");
-					TShock.Log.ConsoleError("aliascmd error: {0} tried to execute alias {1} which failed with error {2}: {3}", e.CommandArgs.Player.Name, e.CommandIdentifier, ex.Message, ex.ToString());
+					e.CommandArgs.Player.SendErrorMessage("发生错误。");
+					TShock.Log.ConsoleError("自定义命令错误:{0}试图执行{1}，然后发生了错误{2}: {3}", e.CommandArgs.Player.Name, e.CommandIdentifier, ex.Message, ex.ToString());
 					return;
 				}
 			}
@@ -265,7 +265,7 @@ namespace Wolfje.Plugins.SEconomy.CmdAliasModule {
 				//replace parameter markers with actual parameter values
 				ReplaceParameterMarkers(parameters, ref mangledString);
 
-				mangledString = mangledString.Replace("$calleraccount", player.UserAccountName);
+				mangledString = mangledString.Replace("$calleraccount", player.Name);
 				mangledString = mangledString.Replace("$callername", player.Name);
 
 				//$random(x,y) support.  Returns a random number between x and y
@@ -284,7 +284,7 @@ namespace Wolfje.Plugins.SEconomy.CmdAliasModule {
 								mangledString = mangledString.Replace(match.ToString(), randomGenerator.Next(randomFrom, randomTo).ToString());
 							}
 						} else {
-							TShock.Log.ConsoleError(match.ToString() + " has some stupid shit in it, have a look at your AliasCmd config file.");
+							TShock.Log.ConsoleError(match.ToString() + " 出现了异常，请检查你的CmdAlias配置文件。");
 							mangledString = mangledString.Replace(match.ToString(), "");
 						}
 					}
@@ -331,7 +331,7 @@ namespace Wolfje.Plugins.SEconomy.CmdAliasModule {
 							player.PermissionlessInvoke(mangledString);
 						}
 					} else {
-						TShock.Log.ConsoleError(string.Format("cmdalias {0}: calling yourself in an alias will cause an infinite loop. Ignoring.", alias.CommandAlias));
+						TShock.Log.ConsoleError(string.Format("cmdalias {0}: 无限递归，已忽略。", alias.CommandAlias));
 					}
 				} catch {
 					//execute the command disregarding permissions

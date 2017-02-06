@@ -48,6 +48,7 @@ namespace Wolfje.Plugins.SEconomy.Lang {
 			Regex resourceRegex = new Regex(@"\$(.*)$");
 			string localeDir = string.Format("{1}{0}Lang{0}", System.IO.Path.DirectorySeparatorChar, Config.BaseDirectory);
 
+			Directory.CreateDirectory(localeDir);
 			foreach (string resourceName in Assembly.GetExecutingAssembly().GetManifestResourceNames()) {
 				string fullResourcePath = null;
 				string fileName = null;
@@ -60,12 +61,8 @@ namespace Wolfje.Plugins.SEconomy.Lang {
 					continue;
 				}
 
-				fullResourcePath = string.Format("{0}{1}{2}", localeDir, System.IO.Path.DirectorySeparatorChar, fileName);
+				fullResourcePath = string.Format("{0}{2}", localeDir, System.IO.Path.DirectorySeparatorChar, fileName);
 				try {
-					if (System.IO.File.Exists(fullResourcePath) == true) {
-						continue;
-					}
-
 					using (StreamReader sr = new StreamReader(Assembly.GetExecutingAssembly().GetManifestResourceStream(resourceName))) {
 						System.IO.File.WriteAllText(fullResourcePath, sr.ReadToEnd());
 					}

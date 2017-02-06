@@ -28,6 +28,8 @@ namespace Wolfje.Plugins.SEconomy.Configuration {
 		public string DbUsername = "username";
 		public string DbPassword = "password";
 		public string DbName = "seconomy";
+		public string DbPort = "3366";
+		public string ConnectTimeout = "60";
 		public string DbOverrideConnectionString = "";
 	}
 }

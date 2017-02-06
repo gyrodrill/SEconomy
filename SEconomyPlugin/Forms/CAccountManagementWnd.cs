@@ -89,14 +89,14 @@ namespace Wolfje.Plugins.SEconomy.Forms {
             gvTransactions.DataSource = qTransactions;
             tranList = SecInstance.RunningJournal.Transactions;
 
-            player = TShock.Players.FirstOrDefault(i => i != null && i.UserAccountName == selectedAccount.UserAccountName);
+            player = TShock.Players.FirstOrDefault(i => i != null && i.Name == selectedAccount.UserAccountName);
 
-            lblStatus.Text = string.Format("Loaded {0} transactions for {1}.", qTransactions.Count(), selectedAccount.UserAccountName);
+            lblStatus.Text = string.Format("已加载{1}的{0}次交易。", qTransactions.Count(), selectedAccount.UserAccountName);
             if (player != null) {
-                lblOnline.Text = "Online";
+                lblOnline.Text = "在线";
                 lblOnline.ForeColor = System.Drawing.Color.DarkGreen;
             } else {
-                lblOnline.Text = "Offline";
+                lblOnline.Text = "离线";
                 lblOnline.ForeColor = System.Drawing.Color.Red;
             }
 
@@ -108,7 +108,7 @@ namespace Wolfje.Plugins.SEconomy.Forms {
             }
             this.MainThreadInvoke(() => {
                 lblBalance.Text = selectedAccount.Balance.ToLongString(true);
-                lblName.Text = string.Format("{0}, acccount ID {1}", selectedAccount.UserAccountName, selectedAccount.BankAccountK);
+                lblName.Text = string.Format("{0}, 账户ID{1}", selectedAccount.UserAccountName, selectedAccount.BankAccountK);
             });
         }
 
@@ -119,7 +119,7 @@ namespace Wolfje.Plugins.SEconomy.Forms {
 
             int i = 0;
             this.MainThreadInvoke(() => {
-                lblStatus.Text = "Syncing accounts";
+                lblStatus.Text = "正在同步账户";
                 DisableAllControls(this, true, ref disabledControls);
             });
 
@@ -136,7 +136,7 @@ namespace Wolfje.Plugins.SEconomy.Forms {
                     Balance = account.Balance,
                     Value = account.BankAccountK,
                     HasAccount = (account.IsPluginAccount == false || account.IsSystemAccount == false) && tshockAccounts.Any(x => x == account.UserAccountName),
-                    IsOnline = (account.IsPluginAccount == true || account.IsSystemAccount == true) || TShock.Players.Any(x => x != null && x.UserAccountName == account.UserAccountName),
+                    IsOnline = (account.IsPluginAccount == true || account.IsSystemAccount == true) || TShock.Players.Any(x => x != null && x.Name == account.UserAccountName),
                     IsSystem = account.IsSystemAccount || account.IsPluginAccount
                 };
 
@@ -157,7 +157,7 @@ namespace Wolfje.Plugins.SEconomy.Forms {
 
                 EnableAllControls(disabledControls);
 
-                lblStatus.Text = "Done.";
+                lblStatus.Text = "同步完成。";
             });
         }
 
@@ -170,7 +170,7 @@ namespace Wolfje.Plugins.SEconomy.Forms {
             await LoadAccountsAsync();
             this.MainThreadInvoke(() => {
                 toolStripProgressBar1.Value = 100;
-                lblStatus.Text = "Done.";
+                lblStatus.Text = "完成。";
             });
         }
 
@@ -184,7 +184,7 @@ namespace Wolfje.Plugins.SEconomy.Forms {
             if (selectedSummary != null) {
                 await LoadTransactionsForUser(selectedSummary.Value);
             } else {
-                MessageBox.Show("Could not load bank account " + selectedSummary.DisplayValue, "Error");
+                MessageBox.Show("无法加载账户" + selectedSummary.DisplayValue, "错误");
             }
         }
 
@@ -216,7 +216,7 @@ namespace Wolfje.Plugins.SEconomy.Forms {
                 hitTestInfo = gvTransactions.HitTest(e.X, e.Y);
                 // If clicked on a cell
                 if (hitTestInfo.Type == DataGridViewHitTestType.Cell) {
-                    ctxDeleteTransactionItem.Text = string.Format("Delete {0} transactions", gvTransactions.SelectedRows.Count);
+                    ctxDeleteTransactionItem.Text = string.Format("删除了{0}次交易。", gvTransactions.SelectedRows.Count);
                     ctxTransaction.Show(gvTransactions, e.X, e.Y);
                 }
 
@@ -248,7 +248,7 @@ namespace Wolfje.Plugins.SEconomy.Forms {
 
                             //invoke GUI updates on gui thread
                             this.MainThreadInvoke(() => {
-                                lblStatus.Text = string.Format("Deleted transaction {0} for {1}", selectedTrans.BankAccountTransactionK, ((Money)selectedTrans.Amount).ToLongString(true));
+                                lblStatus.Text = string.Format("删除了{1}的交易{0}。", selectedTrans.BankAccountTransactionK, ((Money)selectedTrans.Amount).ToLongString(true));
                                 toolStripProgressBar1.Value = Convert.ToInt32(((double)i / (double)count) * 100);
                             });
 
@@ -296,7 +296,7 @@ namespace Wolfje.Plugins.SEconomy.Forms {
 
         private async void btnResetTrans_Click(object sender, EventArgs e)
         {
-            if (MessageBox.Show("This will delete all transactions for this user.  This could take a long time and SEconomy performance could be impacted.  The user's balance will be reset to 0 copper.", "Delete all Transactions", MessageBoxButtons.YesNo, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button2) == System.Windows.Forms.DialogResult.Yes) {
+            if (MessageBox.Show("这将删除该用户的所有交易记录。这将消耗很长时间，并且SEconomy插件的性能将会受到影响。该用户的余额将被设为0。", "删除所有交易", MessageBoxButtons.YesNo, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button2) == System.Windows.Forms.DialogResult.Yes) {
                 Journal.IBankAccount account = SecInstance.RunningJournal.GetBankAccount(currentlySelectedAccount.Value);
 
                 gvTransactions.Enabled = false;
@@ -305,7 +305,7 @@ namespace Wolfje.Plugins.SEconomy.Forms {
                 btnResetTrans.Enabled = false;
                 btnShowFrom.Enabled = false;
 
-                lblStatus.Text = "Resetting all transactions for " + currentlySelectedAccount.Name;
+				lblStatus.Text = "正在删除" + currentlySelectedAccount.Name + "的所有交易。";
                 toolStripProgressBar1.Value = 0;
                 toolStripProgressBar1.Style = ProgressBarStyle.Marquee;
 
@@ -472,7 +472,7 @@ namespace Wolfje.Plugins.SEconomy.Forms {
             }
 
             deleteXAccountsToolStripMenuItem.Enabled = count > 0;
-            deleteXAccountsToolStripMenuItem.Text = "Delete " + count + " Accounts";
+            deleteXAccountsToolStripMenuItem.Text = "删除了" + count + "个账户。";
         }
 
         private async void deleteXAccountsToolStripMenuItem_Click(object sender, EventArgs e)
@@ -493,7 +493,7 @@ namespace Wolfje.Plugins.SEconomy.Forms {
             }
 
             if (gvAccounts.SelectedRows.Count == 0
-                || MessageBox.Show("Really delete " + count + " accounts?", "Delete Accounts",
+                || MessageBox.Show("确认要删除" + count + "个账户？", "删除账户",
                     MessageBoxButtons.YesNo) == System.Windows.Forms.DialogResult.No) {
                 return;
             }
@@ -503,7 +503,7 @@ namespace Wolfje.Plugins.SEconomy.Forms {
 
             foreach (DataGridViewRow row in gvAccounts.SelectedRows) {
                 this.MainThreadInvoke(() => {
-                    this.lblStatus.Text = string.Format("Deleting {0}/{1}", i, count);
+                    this.lblStatus.Text = string.Format("正在删除{0}/{1}", i, count);
                     this.toolStripProgressBar1.Value = (int)((double)i / (double)count * 100);
                 });
 
@@ -548,7 +548,7 @@ namespace Wolfje.Plugins.SEconomy.Forms {
             EnableAllControls(disabledControls);
 
             this.MainThreadInvoke(() => {
-                this.lblStatus.Text = "Done";
+                this.lblStatus.Text = "完成。";
                 this.toolStripProgressBar1.Value = 0;
             });
         }
@@ -560,18 +560,18 @@ namespace Wolfje.Plugins.SEconomy.Forms {
             AccountSummary summary = row.DataBoundItem as AccountSummary;
 
             if (summary.IsSystem == true) {
-                cell.Value = "System";
+                cell.Value = "系统";
                 row.DefaultCellStyle.BackColor = System.Drawing.Color.FromArgb(217, 237, 247);
             } else if (summary.IsOnline == true) {
-                cell.Value = "Online";
+                cell.Value = "在线";
                 row.DefaultCellStyle.BackColor = System.Drawing.Color.FromArgb(223, 240, 216);
             } else if (summary.HasAccount == false) {
                 row.DefaultCellStyle.BackColor = System.Drawing.Color.FromArgb(242, 222, 222);
-                cell.Value = "Orphan";
+                cell.Value = "无账户";
 
             } else {
                 row.DefaultCellStyle.ForeColor = System.Drawing.Color.DarkGray;
-                cell.Value = "Offline";
+                cell.Value = "离线";
             }
         }
 
@@ -594,9 +594,9 @@ namespace Wolfje.Plugins.SEconomy.Forms {
         {
             BindUserList();
         }
-    }
+	}
 
-    class AccountSummary {
+	class AccountSummary {
         public string Name { get; set; }
 
         public long Value { get; set; }

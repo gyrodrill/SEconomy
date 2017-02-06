@@ -50,9 +50,9 @@ namespace Wolfje.Plugins.SEconomy.Journal.MySQLJournal {
 
 			this.instance = instance;
 			this.sqlProperties = sqlProperties;
-			this.connectionString = string.Format("server={0};user id={1};password={2};connect timeout=60;", 
-				sqlProperties.DbHost,
-				sqlProperties.DbUsername, sqlProperties.DbPassword);
+			this.connectionString = string.Format("server={0};port={1};user id={2};password={3};connect timeout={4};", 
+				sqlProperties.DbHost,sqlProperties.DbPort,
+				sqlProperties.DbUsername, sqlProperties.DbPassword,sqlProperties.ConnectTimeout);
 			this.SEconomyInstance = instance;
 			this.mysqlConnection = new MySqlConnection(connectionString);
 		}
@@ -407,7 +407,7 @@ namespace Wolfje.Plugins.SEconomy.Journal.MySQLJournal {
 			foreach (TSPlayer player in TShockAPI.TShock.Players) {
 				IBankAccount account = null;
 				if (player == null
-				    || player.UserAccountName == null
+				    || player.Name == null
 				    || (account = instance.GetBankAccount(player)) == null) {
 					continue;
 				}

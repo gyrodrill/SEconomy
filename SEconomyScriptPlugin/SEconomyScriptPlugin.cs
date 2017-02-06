@@ -30,13 +30,13 @@ using Wolfje.Plugins.Jist.Framework;
 using Wolfje.Plugins.SEconomy.Journal;
 
 namespace Wolfje.Plugins.SEconomy.SEconomyScriptPlugin {
-	[ApiVersion(1, 22)]
+	[ApiVersion(2, 0)]
 	public class SEconomyScriptPlugin : TerrariaPlugin {
-		public override string Author { get { return "Wolfje"; } }
+		public override string Author { get { return "Wolfje 汉化:恋"; } }
 
 		public override string Description { get { return "Provides SEconomy scripting support to Jist"; } }
 
-		public override string Name { get { return "SEconomy Jist Support"; } }
+		public override string Name { get { return "SEconomy Jist支持插件"; } }
 
 		public override Version Version { get { return Assembly.GetExecutingAssembly().GetName().Version; } }
 

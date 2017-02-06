@@ -28,8 +28,9 @@ namespace xml2sql {
 			AppDomain.CurrentDomain.AssemblyResolve += CurrentDomain_AssemblyResolve;
 
 			Console.ForegroundColor = ConsoleColor.Cyan;
-			Console.WriteLine(" xml2sql - an XML to SQL journal importer");
-			Console.WriteLine(" For use with SEconomy Update 15 or newer");
+			Console.WriteLine(" xml2sql - XML转SQL工具");
+			Console.WriteLine(" 用于SEconomy");
+			Console.WriteLine(" 请将本工具放置于TerrariaServer.exe和SEconomy插件同文件夹。");
 			Console.WriteLine();
 
 			new Program().Process();
@@ -127,7 +128,7 @@ namespace xml2sql {
 			Console.WriteLine();
 
 			if (DatabaseExists() == false) {
-				Console.WriteLine("Your SEconomy database does not exist.  Create it?");
+				Console.WriteLine("SEconomy数据库不存在。是否创建？");
 				Console.Write("[y/n] ");
 				if (Console.ReadKey().KeyChar != 'y') {
 					return;
@@ -135,8 +136,8 @@ namespace xml2sql {
 				CreateDatabase();
 			}
 
-			Console.WriteLine("Your SEconomy database will be flushed.  All accounts, and transactions will be deleted before the import.");
-			Console.Write("Continue? [y/n] ");
+			Console.WriteLine("SEconomy数据库将被清空。所有账户及交易记录在导入成功前将被删除。");
+			Console.Write("是否继续？[y/n] ");
 
 			if (Console.ReadKey().KeyChar != 'y') {
 				return;
@@ -149,11 +150,9 @@ namespace xml2sql {
 			Connection.Query(string.Format("DELETE FROM `{0}`.`bank_account_transaction`;", sec.Configuration.SQLConnectionProperties.DbName));
 			Connection.Query(string.Format("ALTER TABLE `{0}`.`bank_account_transaction` AUTO_INCREMENT 0;", sec.Configuration.SQLConnectionProperties.DbName));
 
-			Console.WriteLine("This will probably take a while...\r\n");
+			Console.WriteLine("正在删除，请稍候。\r\n");
 			Console.WriteLine();
-			if (JournalLoadingPercentChanged != null) {
-				JournalLoadingPercentChanged(null, args);
-			}
+			JournalLoadingPercentChanged?.Invoke(null, args);
 
 			for (int i = 0; i < journal.BankAccounts.Count; i++) {
 				IBankAccount account = journal.BankAccounts.ElementAtOrDefault(i);
@@ -227,8 +226,8 @@ namespace xml2sql {
 				JournalLoadingPercentChanged(null, args);
 			}
 
-			Console.WriteLine("import complete", skipped);
-			Console.WriteLine("Press any key to exit");
+			Console.WriteLine("导入成功。", skipped);
+			Console.WriteLine("按任意键退出。");
 			Console.Read();
 		}
 

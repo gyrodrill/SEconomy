@@ -179,7 +179,7 @@ namespace Wolfje.Plugins.SEconomy.JistAliasModule {
 				//has the time elapsed greater than the cooldown period?
 				if (DateTime.UtcNow <= canRunNext
 				    && e.CommandArgs.Player.Group.HasPermission("aliascmd.bypasscooldown") == false) {
-					e.CommandArgs.Player.SendErrorMessage("{0}: You need to wait {1:0} more seconds to be able to use that.",
+					e.CommandArgs.Player.SendErrorMessage("{0}: 你需要等{1:0}秒才能再次使用这个命令。",
 						alias.CommandAlias,
 						canRunNext.Subtract(DateTime.UtcNow).TotalSeconds);
 					return;
@@ -221,18 +221,18 @@ namespace Wolfje.Plugins.SEconomy.JistAliasModule {
 
                 
 				if ((account = SEconomyPlugin.Instance.GetBankAccount(e.CommandArgs.Player)) == null) {
-					e.CommandArgs.Player.SendErrorMessage("This command costs money and you don't have a bank account.  Please log in first.");
+					e.CommandArgs.Player.SendErrorMessage("这个命令需要登录。");
 					return;
 				}
 
 				if (account.IsAccountEnabled == false) {
-					e.CommandArgs.Player.SendErrorMessage("This command costs money and your account is disabled.");
+					e.CommandArgs.Player.SendErrorMessage("你的账户已被禁用。");
 					return;
 				}
 
 				if (account.Balance < commandCost) {
 					Money difference = commandCost - account.Balance;
-					e.CommandArgs.Player.SendErrorMessage("This command costs {0}. You need {1} more to be able to use this.",
+					e.CommandArgs.Player.SendErrorMessage("使用这个命令需要{0}。你还需要{1}才可以使用这个命令。",
 						commandCost.ToLongString(),
 						difference.ToLongString());
 				}
@@ -250,7 +250,7 @@ namespace Wolfje.Plugins.SEconomy.JistAliasModule {
 						                                      string.Format("AC: {0} cmd {1}", e.CommandArgs.Player.Name, alias.CommandAlias));
 
 					if (trans.TransferSucceeded == false) {
-						e.CommandArgs.Player.SendErrorMessage("Your payment failed.");
+						e.CommandArgs.Player.SendErrorMessage("支付失败。");
 						return;
 					}
 
@@ -273,7 +273,7 @@ namespace Wolfje.Plugins.SEconomy.JistAliasModule {
                          * exception happens.
                          */
 						Jist.ScriptLog.ErrorFormat("alias",
-							"{0} paid {1} for alias {2} but it failed and was refunded.",
+							"{0}支付了{1}以使用命令{2}，但是命令失败了。已退还。",
 							e.CommandArgs.Player.Name,
 							commandCost.ToString(),
 							alias.CommandAlias);
@@ -281,7 +281,7 @@ namespace Wolfje.Plugins.SEconomy.JistAliasModule {
 					}
 				} catch (Exception ex) {
 					e.CommandArgs.Player.SendErrorMessage("An error occured in the alias.");
-					TShock.Log.ConsoleError("aliascmd error: {0} tried to execute alias {1} which failed with error {2}: {3}",
+					TShock.Log.ConsoleError("自定义命令错误:{0}试图执行{1}，然后发生了错误{2}: {3}",
 						e.CommandArgs.Player.Name,
 						e.CommandIdentifier,
 						ex.Message,
